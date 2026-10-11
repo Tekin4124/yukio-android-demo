@@ -1,0 +1,61 @@
+{
+  "ilanlar": [
+    {
+      "gonderici_il": "İSTANBUL",
+      "gonderici_ilce": null,
+      "alici_il": "ANKARA",
+      "alici_ilce": null,
+      "arac_tipi": "TIR",
+      "dorse_tipi": null,
+      "tonaj": "20 ton",
+      "fiyat": "18000",
+      "telefon": null,
+      "firma": null,
+      "yetkili": null,
+      "yuk_cinsi": "DEMO",
+      "rota_noktalari": [
+        {
+          "rol": "ALIS",
+          "sira": 0,
+          "il": "İSTANBUL",
+          "ilce": null
+        },
+        {
+          "rol": "TESLIM",
+          "sira": 1,
+          "il": "ANKARA",
+          "ilce": null
+        }
+      ]
+    },
+    {
+      "gonderici_il": "BURSA",
+      "gonderici_ilce": null,
+      "alici_il": "İZMİR",
+      "alici_ilce": null,
+      "arac_tipi": "KAMYON",
+      "dorse_tipi": null,
+      "tonaj": "8 ton",
+      "fiyat": "9000",
+      "telefon": null,
+      "firma": null,
+      "yetkili": null,
+      "yuk_cinsi": "DEMO",
+      "rota_noktalari": [
+        {
+          "rol": "ALIS",
+          "sira": 0,
+          "il": "BURSA",
+          "ilce": null
+        },
+        {
+          "rol": "TESLIM",
+          "sira": 1,
+          "il": "İZMİR",
+          "ilce": null
+        }
+      ]
+    }
+  ],
+  "hata": null
+}

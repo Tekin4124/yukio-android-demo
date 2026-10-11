@@ -1,0 +1,2 @@
+# Android Studio writes your actual SDK path into ignored local.properties.
+# sdk.dir=/absolute/path/to/Android/Sdk

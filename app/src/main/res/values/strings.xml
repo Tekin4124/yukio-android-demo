@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Yükio Demo</string>
+    <string name="notification_listener_label">Yükio Bildirim Servisi</string>
+</resources>

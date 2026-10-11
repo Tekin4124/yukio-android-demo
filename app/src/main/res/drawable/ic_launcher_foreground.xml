@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Rota glow (yumuşak alt katman) -->
+    <path
+        android:pathData="M24,82 C 36,82 36,70 50,70 S 72,60 76,50"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFD23F"
+        android:strokeAlpha="0.30"
+        android:strokeWidth="9"
+        android:strokeLineCap="round" />
+
+    <!-- Rota ana stroke (sarı→turuncu gradient) -->
+    <path
+        android:pathData="M24,82 C 36,82 36,70 50,70 S 72,60 76,50"
+        android:fillColor="#00000000"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="24" android:startY="82"
+                android:endX="76" android:endY="50">
+                <item android:offset="0.0" android:color="#FFFFD23F" />
+                <item android:offset="1.0" android:color="#FFFF8A3D" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Başlangıç noktası -->
+    <path
+        android:fillColor="#FFFFD23F"
+        android:pathData="M24,82 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+    <path
+        android:fillColor="#FF1D4ED8"
+        android:pathData="M24,82 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+    <!-- Pin gölgesi -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M76,20 C 84,20 89,25 89,32 C 89,42 76,52 76,52 C 76,52 63,42 63,32 C 63,25 68,20 76,20 Z" />
+    <!-- Pin gövdesi (beyaz) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M76,18 C 84,18 89,23 89,30 C 89,40 76,50 76,50 C 76,50 63,40 63,30 C 63,23 68,18 76,18 Z" />
+    <!-- Pin iç (turuncu) -->
+    <path
+        android:fillColor="#FFFF5A1F"
+        android:pathData="M76,30 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0" />
+    <!-- Pin iç parlama -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M75,29 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0" />
+
+    <!-- Kamyon yer gölgesi -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M30,76 a18,2.4 0 1,0 36,0 a18,2.4 0 1,0 -36,0" />
+
+    <!-- Kamyon kasası (beyaz) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M28,58 h22 a2,2 0 0,1 2,2 v12 a2,2 0 0,1 -2,2 h-22 a2,2 0 0,1 -2,-2 v-12 a2,2 0 0,1 2,-2 z" />
+    <!-- Kasa orta şeridi -->
+    <path
+        android:fillColor="#FF1D4ED8"
+        android:fillAlpha="0.18"
+        android:pathData="M28,66 h24 v1.6 h-24 z" />
+
+    <!-- Şoför kabini (beyaz) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M52,62 h6 l6,6 v6 h-12 z" />
+
+    <!-- Pencere (lacivert) -->
+    <path
+        android:fillColor="#FF1D4ED8"
+        android:pathData="M54,64 h3.5 l4,4 h-7.5 z" />
+
+    <!-- Sol tekerlek -->
+    <path
+        android:fillColor="#FF0B0D12"
+        android:pathData="M34,75 m-3.8,0 a3.8,3.8 0 1,0 7.6,0 a3.8,3.8 0 1,0 -7.6,0" />
+    <path
+        android:fillColor="#FF3A4256"
+        android:pathData="M34,75 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0" />
+
+    <!-- Sağ tekerlek -->
+    <path
+        android:fillColor="#FF0B0D12"
+        android:pathData="M58,75 m-3.8,0 a3.8,3.8 0 1,0 7.6,0 a3.8,3.8 0 1,0 -7.6,0" />
+    <path
+        android:fillColor="#FF3A4256"
+        android:pathData="M58,75 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0" />
+</vector>

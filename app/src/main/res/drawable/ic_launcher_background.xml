@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Lacivert diagonal gradient -->
+    <path android:pathData="M0,0 H108 V108 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="0"
+                android:endX="108" android:endY="108">
+                <item android:offset="0.0" android:color="#FF1F3A8A" />
+                <item android:offset="0.55" android:color="#FF1D4ED8" />
+                <item android:offset="1.0" android:color="#FF0B1D5E" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sol-üst yumuşak parlama -->
+    <path android:pathData="M0,0 H108 V108 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="22" android:centerY="14"
+                android:gradientRadius="78">
+                <item android:offset="0.0" android:color="#4DFFFFFF" />
+                <item android:offset="1.0" android:color="#00FFFFFF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- İnce harita ızgarası -->
+    <path
+        android:pathData="M0,30 H108 M0,54 H108 M0,78 H108 M30,0 V108 M54,0 V108 M78,0 V108"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeAlpha="0.07"
+        android:strokeWidth="0.6" />
+</vector>
