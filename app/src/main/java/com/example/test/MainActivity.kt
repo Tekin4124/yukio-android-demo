@@ -445,7 +445,7 @@ fun AppNavHost(
                 )
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    if (!notificationHealth.automaticChecksPassed) {
+                    if (BuildConfig.APPLICATION_ID != "com.yukio.demo" && !notificationHealth.automaticChecksPassed) {
                         BildirimSagligiBanner(
                             status = notificationHealth,
                             onOpenHealth = {

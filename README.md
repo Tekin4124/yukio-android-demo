@@ -7,6 +7,19 @@ incelemek içindir. Ticari ürünün özel parser'ı ve üretim backend'i bu dep
 **API anahtarı, abonelik ve geliştiriciden erişim istemek gerekmez.** İlk açılışta beş
 sentetik ilan görünür. WhatsApp veya bildirim izni vermeden listeyi ve profili deneyebilirsin.
 
+## Ekran görüntüleri
+
+<img src="docs/screenshots/ilanlar.png" alt="Örnek yük ilanları" width="300"> <img src="docs/screenshots/giris.png" alt="Yerel sürüm başlangıç ekranı" width="300">
+
+Görseller önceki 1.0.6 örnek sürümünün fiziksel telefon kaydıdır. 1.0.7 sürümünde yerel örnek kullanım için gerekmeyen WhatsApp erişim uyarısı kaldırıldı.
+
+
+## Hazır APK
+
+[**Yukio.apk indir**](https://github.com/Tekin4124/yukio-android-demo/releases/latest/download/Yukio.apk) · [Sürüm notları ve SHA-256](https://github.com/Tekin4124/yukio-android-demo/releases/latest)
+
+Android 8.0 ve üzeri. APK yerel debug anahtarıyla imzalanmış inceleme sürümüdür; üretim uygulaması değildir.
+
 ## Hızlı başlangıç
 
 Android Studio'da projeyi aç, SDK 36 ve JDK 17 ile `app` debug sürümünü çalıştır.

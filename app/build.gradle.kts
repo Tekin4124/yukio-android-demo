@@ -23,8 +23,8 @@ android {
         applicationId = "com.yukio.demo"
         minSdk = 26
         targetSdk = 36
-        versionCode = 42
-        versionName = "1.0.6-demo"
+        versionCode = 43
+        versionName = "1.0.7-demo"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", "\"$demoBaseUrl\"")
         buildConfigField("String", "PRIVACY_URL", "\"${demoBaseUrl}privacy\"")
