@@ -21,6 +21,7 @@ kapalıdır. Yerel demo çok kullanıcılı sunucu güvenliği örneği değildi
 Doğrulama: 129 Android birim testi (0 hata), yerel Python API'ın 8 testi (0 hata),
 lint başarılı, paylaşılabilir kaynak denetimi, APK üzerinde bilinen üretim adresi / credential
 örüntü denetimi, sürüm ve uygulama kimliği kontrolü. Bu kontroller tam kapsamlı
-bağımsız güvenlik denetimi anlamına gelmez. Fiziksel telefon bağlı değildi;
-emülatör bu ortamda güvenilir biçimde açılamadığı için yeni ekranların çalışma
-zamanı görsel kontrolü tamamlanamadı.
+bağımsız güvenlik denetimi anlamına gelmez. Fiziksel Samsung telefonda yeni ilan, kart önizleme, onay, ilanlarım, düzenleme
+penceresi, tam ekran detay ve referans simülasyonu kontrol edildi. Aynı örnek
+mesaj yeniden yayınlandığında yalnız ilk 2 ilan korundu. Başlığın sistem saat
+çubuğuyla çakışması giderildi. README görselleri bu demo akışından yenilendi.

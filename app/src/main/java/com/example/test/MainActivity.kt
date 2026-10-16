@@ -473,7 +473,7 @@ fun AppNavHost(
                             },
                             onCreateListing = { navController.navigate(AppRoute.ManualListing.route) },
                             openLoadId = openLoadId,
-                            topBarUsesStatusInsets = notificationHealth.automaticChecksPassed,
+                            topBarUsesStatusInsets = true,
                             onOpenLoadHandled = {
                                 it.savedStateHandle["openLoadId"] = null
                             },

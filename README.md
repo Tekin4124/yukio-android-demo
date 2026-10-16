@@ -9,16 +9,22 @@ sentetik ilan görünür. WhatsApp veya bildirim izni vermeden listeyi ve profil
 
 ## Ekran görüntüleri
 
-<img src="docs/screenshots/ilanlar.png" alt="Örnek yük ilanları" width="300"> <img src="docs/screenshots/giris.png" alt="Yerel sürüm başlangıç ekranı" width="300">
+Görseller v44 (1.0.8-demo) sürümünden fiziksel Samsung telefonda alınmıştır.
+Yalnız sentetik demo ilanları ve aranamayan örnek telefon numaraları içerir.
 
-Görseller önceki demo sürümüne aittir. v44 (1.0.8-demo) yeni ilan ve referans akışlarını ekler.
+<img src="docs/screenshots/ilanlar.png" alt="Demo ilan listesi" width="280"> <img src="docs/screenshots/detay.png" alt="Tam ekran ilan detayı" width="280">
 
+<img src="docs/screenshots/yeni-ilan.png" alt="Yeni ilan metni" width="280"> <img src="docs/screenshots/onizleme.png" alt="İlan kartlarının önizlemesi" width="280">
+
+<img src="docs/screenshots/ilanlarim.png" alt="Cihazdaki demo ilanlarım" width="280"> <img src="docs/screenshots/duzenle.png" alt="İlanı düzenleme" width="280">
+
+<img src="docs/screenshots/referans.png" alt="Örnek referans kodu" width="280"> <img src="docs/screenshots/referans-kullan.png" alt="İki sanal hesap için referans sonucu" width="280">
 
 ## Yayımlanmış APK
 
 [**Yukio.apk indir**](https://github.com/Tekin4124/yukio-android-demo/releases/latest/download/Yukio.apk) · [Sürüm notları ve SHA-256](https://github.com/Tekin4124/yukio-android-demo/releases/latest)
 
-Bağlantı son yayımlanan sürümü açar; v44 APK ayrıca hazırlanmıştır.
+Son sürüm: v44 (1.0.8-demo). Kaynak ve APK aynı sürümden hazırlanmıştır.
 Android 8.0 ve üzeri. APK yerel debug anahtarıyla imzalanmış inceleme sürümüdür; üretim uygulaması değildir.
 
 ## Hızlı başlangıç
