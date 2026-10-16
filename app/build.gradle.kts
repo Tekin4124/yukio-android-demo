@@ -12,7 +12,7 @@ val demoBaseUrl = (project.findProperty("DEMO_BASE_URL") as String?)
     ?: "http://127.0.0.1:3000/"
 val demoUri = URI(demoBaseUrl)
 require(demoUri.scheme == "http" && demoUri.host in setOf("127.0.0.1", "localhost", "10.0.2.2") &&
-    demoUri.userInfo == null && demoUri.query == null && demoUri.fragment == null && demoBaseUrl.endsWith("/")) {
+    demoUri.rawPath == "/" && demoUri.port in -1..65535 && demoUri.userInfo == null && demoUri.query == null && demoUri.fragment == null && demoBaseUrl.endsWith("/")) {
     "DEMO_BASE_URL must be a local HTTP URL ending in /"
 }
 
@@ -23,8 +23,8 @@ android {
         applicationId = "com.yukio.demo"
         minSdk = 26
         targetSdk = 36
-        versionCode = 43
-        versionName = "1.0.7-demo"
+        versionCode = 44
+        versionName = "1.0.8-demo"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", "\"$demoBaseUrl\"")
         buildConfigField("String", "PRIVACY_URL", "\"${demoBaseUrl}privacy\"")

@@ -167,6 +167,7 @@ fun VehicleProfileScreen(
     viewModel: UserProfileViewModel = viewModel(),
     themeMode: AppThemeMode,
     onThemeModeChange: (AppThemeMode) -> Unit,
+    onOpenReferral: () -> Unit = {},
     onOpenNotificationHealth: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -345,6 +346,8 @@ fun VehicleProfileScreen(
                                 val workManager = WorkManager.getInstance(appContext)
                                 workManager.cancelUniqueWork("failed_message_retry").result.get()
                                 workManager.cancelUniqueWork("failed_message_retry_once").result.get()
+                                com.example.test.data.remote.ManualListingsRepository.clear()
+                                appContext.getSharedPreferences("demo_referral",Context.MODE_PRIVATE).edit().clear().commit()
                                 database.failedMessageDao().deleteAll()
                                 database.loadOfferDao().deleteAll()
                                 database.parseDebugLogDao().deleteAll()
@@ -546,6 +549,7 @@ fun VehicleProfileScreen(
 
             item {
                 ProfileCardV2(title = "DEMO") {
+                    TextButton(onClick=onOpenReferral){Text("Arkadaşını davet et")}
                     Text("Bu sürüm ücretsiz yerel demodur. Satın alma, Destek ID ve üretim sunucusu bağlantısı yoktur.",
                         style = MaterialTheme.typography.bodySmall)
                 }

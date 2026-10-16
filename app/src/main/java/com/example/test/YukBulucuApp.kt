@@ -16,6 +16,7 @@ import timber.log.Timber
 class YukBulucuApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        com.example.test.data.remote.ManualListingsRepository.initialize(this)
         // Only enable verbose logging in debug builds. DebugTree forwards every
         // Timber.d() to logcat, which on a release device leaks notification
         // payloads, phone numbers and parser bodies to anyone with READ_LOGS.

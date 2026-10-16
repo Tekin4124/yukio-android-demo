@@ -11,13 +11,14 @@ sentetik ilan görünür. WhatsApp veya bildirim izni vermeden listeyi ve profil
 
 <img src="docs/screenshots/ilanlar.png" alt="Örnek yük ilanları" width="300"> <img src="docs/screenshots/giris.png" alt="Yerel sürüm başlangıç ekranı" width="300">
 
-Görseller önceki 1.0.6 örnek sürümünün fiziksel telefon kaydıdır. 1.0.7 sürümünde yerel örnek kullanım için gerekmeyen WhatsApp erişim uyarısı kaldırıldı.
+Görseller önceki demo sürümüne aittir. v44 (1.0.8-demo) yeni ilan ve referans akışlarını ekler.
 
 
-## Hazır APK
+## Yayımlanmış APK
 
 [**Yukio.apk indir**](https://github.com/Tekin4124/yukio-android-demo/releases/latest/download/Yukio.apk) · [Sürüm notları ve SHA-256](https://github.com/Tekin4124/yukio-android-demo/releases/latest)
 
+Bağlantı son yayımlanan sürümü açar; v44 APK ayrıca hazırlanmıştır.
 Android 8.0 ve üzeri. APK yerel debug anahtarıyla imzalanmış inceleme sürümüdür; üretim uygulaması değildir.
 
 ## Hızlı başlangıç
@@ -35,7 +36,25 @@ APK: `app/build/outputs/apk/debug/app-debug.apk`.
 
 Demo uygulama kimliği `com.yukio.demo`; gerçek Yükio kurulumu ve verileriyle çakışmaz.
 
-## Yerel örnek backend — tek komut
+## v44: sunucusuz yeni akışlar
+
+**İlan ekle → Örnek ekle → Kartları hazırla** ile başlayabilirsin.
+Kartları seç, dokunarak düzenle ve onayla. Sonuçlar yalnız bu cihazın demo listesine eklenir.
+İlanlarım sekmesinden yeniden düzenleyebilir veya kaldırabilirsin. Aynı yük ikinci kez eklenmez;
+karışık mesajlarda yalnız yeni kartlar eklenir. Kayıtlar 24 saat sonra görünmez; uygulama yeniden
+başlatıldığında korunur. Yeni ilan sınırı cihaz başına son 60 saniyede 150'dir; günlük sınır yoktur.
+
+Telefon metinden alınır; eksikse onaydan önce istenir. Demo **yalnız** aranamayan
+`0000 000 00 01`–`0000 000 00 99` örnek numaralarını kabul eder. Arama kapalıdır.
+Bu ekrandaki küçük örnek ayrıştırıcı aşağıdaki açık `ŞEHİR -> ŞEHİR | ...` biçimini kullanır;
+üretim parser'ı değildir, serbest WhatsApp mesajlarını çözmez.
+
+**Profil → Arkadaşını davet et → Kod kullan** ekranında `DEMO-FRIEND` girildiğinde
+iki sanal hesaba birer kez 14 gün eklenmesi gösterilir. Kendi kodun `DEMO-MINE` kabul edilmez.
+Bu yalnız arayüz simülasyonudur; gerçek üyelik, ortaklık kodu veya premium hakkı oluşturmaz.
+İlan ve referans örnekleri cihaz verilerini temizleme ayarıyla sıfırlanır.
+
+## Yerel örnek backend — isteğe bağlı
 
 Python 3.10 veya üzeri yeterli; ek paket kurulumu yok:
 
@@ -53,7 +72,7 @@ Android uygulamasından denemek için cihazı USB ile bağla veya emülatör aç
 adb reverse tcp:3000 tcp:3000
 ```
 
-Uygulamada ana ekranın sağ üstündeki **Demo** düğmesine bas, örnek metni gönder ve
+Uygulamada ana ekranın sağ üstündeki **API** düğmesine bas, örnek metni gönder ve
 listeye dön. Mesaj yerel backend'e gider; üretilen ilanlar uygulamanın Room veritabanına
 kaydolur. WhatsApp izni gerekmez.
 
@@ -81,7 +100,9 @@ Amaç API → ilan dönüşümü → veritabanı → ekran akışını çalışt
 
 - Jetpack Compose ile ilan listesi, detay, araç profili ve açık/koyu tema.
 - Room yerel veritabanı, filtreler, sıralama ve profil uygunluğu.
-- Retrofit ile örnek parser sözleşmesi ve çoklu ilan cevabı.
+- Sunucusuz ilan önizleme, onay, düzenleme, tekrar kontrolü ve yerel kalıcılık.
+- İki sanal hesapla referans / 14 günlük ödül simülasyonu.
+- İsteğe bağlı Retrofit örnek parser sözleşmesi ve çoklu ilan cevabı.
 - İsteğe bağlı WhatsApp bildirim dinleyicisi, maskeleme ve retry.
 - Yerel veri temizleme ve bildirim sağlık ayarları.
 

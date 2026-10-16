@@ -20,3 +20,7 @@ Admin, abonelik, örnek toplama ve AI endpoint'leri bulunmaz.
 
 Sunucu girdi veya sonucu diske yazmaz, ağ servisine göndermez. Kimlik doğrulama
 ve üretim hizmeti sağlamaz; localhost dışına bağlama seçeneği bilerek yoktur.
+
+Yeni v44 ilan ve referans ekranları bu HTTP API'ını kullanmaz. Yayın/düzenleme,
+tekrar kontrolü ve referans simülasyonu Android cihazın içinde çalışır.
+`/v1/listings/*`, `/billing/*`, partner ve admin endpoint'leri burada yoktur.

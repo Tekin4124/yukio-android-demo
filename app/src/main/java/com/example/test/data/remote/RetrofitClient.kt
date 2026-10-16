@@ -20,6 +20,18 @@ object RetrofitClient {
     }
 
     private val okHttpClient = OkHttpClient.Builder()
+        .followRedirects(false)
+        .followSslRedirects(false)
+        .dns(object: okhttp3.Dns {
+            override fun lookup(host: String): List<java.net.InetAddress> {
+            require(host in setOf("localhost","127.0.0.1","10.0.2.2")) { "Local demo host required" }
+            return listOf(java.net.InetAddress.getByName(if(host=="localhost") "127.0.0.1" else host))
+            }
+        })
+        .addInterceptor { chain ->
+            require(DemoNetworkPolicy.allowed(chain.request().url.toString())) { "Local demo request required" }
+            chain.proceed(chain.request())
+        }
         .addInterceptor { chain ->
             val req = chain.request().newBuilder().apply {
                 header("User-Agent", "Yukio/${BuildConfig.VERSION_NAME} Android")

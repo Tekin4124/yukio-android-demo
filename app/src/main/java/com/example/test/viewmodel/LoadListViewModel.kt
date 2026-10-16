@@ -15,6 +15,8 @@ import com.example.test.data.local.UserInteractionEntity
 import com.example.test.data.local.UserProfileEntity
 import com.example.test.data.local.effectiveMaxTonnage
 import com.example.test.data.local.effectiveWeightKg
+import com.example.test.data.remote.ManualListingsRepository
+import com.example.test.data.remote.toLoadOrNull
 import com.example.test.data.remote.ParserSampleFeedback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -209,7 +211,7 @@ class LoadListViewModel(application: Application) : AndroidViewModel(application
 
     private fun observeLoads() {
         viewModelScope.launch {
-            val loadsFlow = _filter.distinctLoadQueryParameters(todayStartMillis)
+            val localLoadsFlow = _filter.distinctLoadQueryParameters(todayStartMillis)
                 .flatMapLatest { query ->
                     loadDao.getFiltered(
                         vehicleType = null,
@@ -220,6 +222,11 @@ class LoadListViewModel(application: Application) : AndroidViewModel(application
                     )
                 }
 
+            val loadsFlow = combine(localLoadsFlow, ManualListingsRepository.listings, _filter, todayStartMillis) { local, shared, filter, dayStart ->
+                val query = filter.toLoadQueryParameters(dayStart)
+                (local + shared.mapNotNull { it.toLoadOrNull() }.filter { it.matchesSharedQuery(query) })
+                    .sortedWith(compareByDescending<LoadOfferEntity> { it.createdAt }.thenBy { it.id })
+            }
             combine(
                 loadsFlow,
                 userProfileDao.getProfile(),
@@ -490,4 +497,13 @@ class LoadListViewModel(application: Application) : AndroidViewModel(application
         const val DAY_BOUNDARY_MIN_DELAY_MILLIS = 1_000L
         const val DAY_BOUNDARY_MAX_DELAY_MILLIS = 60_000L
     }
+}
+
+internal fun LoadOfferEntity.matchesSharedQuery(query: LoadQueryParameters): Boolean {
+    if (createdAt < query.createdAfterMillis) return false
+    if (query.minTonnage != null && tonnageTon != null && tonnageTon < query.minTonnage) return false
+    if (query.maxTonnage != null && tonnageTon != null && tonnageTon > query.maxTonnage) return false
+    val city = query.city ?: return true
+    return (listOf(fromCity,toCity,fromDistrict.orEmpty(),toDistrict.orEmpty()) + routeStops.orEmpty().flatMap { listOf(it.city.orEmpty(),it.district.orEmpty()) })
+        .any { normalizeLoadFilterText(it).contains(city) }
 }

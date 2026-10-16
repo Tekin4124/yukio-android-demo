@@ -42,6 +42,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExtendedFloatingActionButton
+import com.example.test.data.remote.ManualListingsRepository
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
@@ -78,6 +87,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -175,14 +186,18 @@ fun MainScreen(
     topBarUsesStatusInsets: Boolean = true,
     onOpenLoadHandled: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToDebugPanel: () -> Unit = {}
+    onNavigateToDebugPanel: () -> Unit = {},
+    onCreateListing: () -> Unit = {},
+    onOpenLoadDetails: (LoadOfferEntity) -> Unit = {},
 ) {
     LoadListScreen(
         openLoadId = openLoadId,
         topBarUsesStatusInsets = topBarUsesStatusInsets,
         onOpenLoadHandled = onOpenLoadHandled,
         onNavigateToProfile = onNavigateToProfile,
-        onNavigateToDebugPanel = onNavigateToDebugPanel
+        onNavigateToDebugPanel = onNavigateToDebugPanel,
+        onCreateListing = onCreateListing,
+        onOpenLoadDetails = onOpenLoadDetails,
     )
 }
 
@@ -207,33 +222,43 @@ fun LoadListScreen(
     topBarUsesStatusInsets: Boolean = true,
     onOpenLoadHandled: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToDebugPanel: () -> Unit = {}
+    onNavigateToDebugPanel: () -> Unit = {},
+    onCreateListing: () -> Unit = {},
+    onOpenLoadDetails: (LoadOfferEntity) -> Unit = {},
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val sharedError by ManualListingsRepository.error.collectAsStateWithLifecycle()
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (isActive) {
+                ManualListingsRepository.refresh()
+                delay(30000)
+            }
+        }
+    }
+
 
     if (uiState.isLoading && uiState.loads.isEmpty()) {
         YukioStartupLoading()
         return
     }
 
+    var showDemoInput by remember { mutableStateOf(false) }
+    if(showDemoInput) DemoInputDialog(onDismiss={showDemoInput=false})
     var showVehicleDialog by remember { mutableStateOf(false) }
     var showCityDialog by remember { mutableStateOf(false) }
     var showSourceGroupDialog by remember { mutableStateOf(false) }
-    var showDemoInput by remember { mutableStateOf(false) }
-    var selectedLoad by remember { mutableStateOf<LoadOfferEntity?>(null) }
-    val debugPanelEnabled = BuildConfig.DEBUG
-
-    // İlan detayı her açılışta OPENED olayını sample'a bağlamayı dener;
-    // dispatcher OPENED'ı sample başına bir kez gönderir (idempotent).
-    LaunchedEffect(selectedLoad?.id) {
-        selectedLoad?.let { viewModel.recordSampleOpened(it) }
-    }
+    var showDebugPasswordDialog by remember { mutableStateOf(false) }
+    var debugPasswordInput by remember { mutableStateOf("") }
+    var debugPasswordError by remember { mutableStateOf(false) }
+    val debugPanelEnabled = false
 
     LaunchedEffect(openLoadId, uiState.loads) {
         val loadId = openLoadId ?: return@LaunchedEffect
         val load = uiState.loads.firstOrNull { it.id == loadId } ?: return@LaunchedEffect
-        selectedLoad = load
+        onOpenLoadDetails(load)
         viewModel.recordInteraction(load, InteractionType.VIEWED)
         ContentlessTelemetry.record(context, TelemetryEvents.funnel("match_viewed"))
         onOpenLoadHandled()
@@ -275,35 +300,69 @@ fun LoadListScreen(
         )
     }
 
-    if (showDemoInput) DemoInputDialog(onDismiss = { showDemoInput = false })
-
-    selectedLoad?.let { load ->
-        LoadDetailBottomSheetV2(
-            load = load,
-            // Aynı WhatsApp mesajından çıkan diğer ilanlar: kaynak vurgusunda
-            // onların rota/fiyat satırları bu ilana boyanmasın diye geçilir.
-            siblingLoads = uiState.loads.filter {
-                it.id != load.id && it.rawMessage == load.rawMessage
+    if (debugPanelEnabled && showDebugPasswordDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDebugPasswordDialog = false
+                debugPasswordInput = ""
+                debugPasswordError = false
             },
-            matchResult = uiState.matchResults[load.id],
-            parseFeedback = uiState.parseFeedback[load.id],
-            onParseFeedback = { feedback ->
-                viewModel.recordInteraction(load, feedback)
+            title = { Text("Şifre") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = debugPasswordInput,
+                        onValueChange = {
+                            debugPasswordInput = it
+                            debugPasswordError = false
+                        },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        isError = debugPasswordError,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (debugPasswordError) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "Hatalı şifre",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             },
-            onCallClick = {
-                viewModel.recordInteraction(load, InteractionType.CALLED)
-                ContentlessTelemetry.record(context, TelemetryEvents.funnel("call_tapped"))
-                context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${load.phone}")))
+            confirmButton = {
+                TextButton(onClick = {
+                    if (debugPasswordInput == "1234") {
+                        showDebugPasswordDialog = false
+                        debugPasswordInput = ""
+                        debugPasswordError = false
+                        onNavigateToDebugPanel()
+                    } else {
+                        debugPasswordError = true
+                    }
+                }) { Text("Tamam") }
             },
-            onDismiss = { selectedLoad = null }
+            dismissButton = {
+                TextButton(onClick = {
+                    showDebugPasswordDialog = false
+                    debugPasswordInput = ""
+                    debugPasswordError = false
+                }) { Text("İptal") }
+            }
         )
     }
 
     Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(onClick = onCreateListing,
+                icon = { Icon(Icons.Default.Add, null) }, text = { Text("İlan ekle") })
+        },
         topBar = {
             TopAppBar(
                 modifier = if (debugPanelEnabled) {
-                    Modifier.debugLongPress { onNavigateToDebugPanel() }
+                    Modifier.debugLongPress { showDebugPasswordDialog = true }
                 } else {
                     Modifier
                 },
@@ -334,7 +393,11 @@ fun LoadListScreen(
                     }
                 },
                 actions = {
-                    TextButton(onClick = { showDemoInput = true }) { Text("Demo") }
+                    TextButton(onClick={showDemoInput=true}){Text("API")}
+                    val refreshScope = rememberCoroutineScope()
+                    IconButton(onClick = { refreshScope.launch { ManualListingsRepository.refresh() } }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Yükio ilanlarını yenile")
+                    }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(Icons.Default.Person, contentDescription = "Profil")
                     }
@@ -357,8 +420,13 @@ fun LoadListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(bottom = 18.dp)
+            contentPadding = PaddingValues(bottom = 96.dp)
         ) {
+            if (sharedError != null) {
+                item { Text(sharedError.orEmpty(), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
+
             stickyHeader {
                 LoadListHeader(
                     uiState = uiState,
@@ -424,7 +492,7 @@ fun LoadListScreen(
                         matchResult = uiState.matchResults[load.id],
                         parserSource = uiState.parserSources[load.id],
                         onClick = {
-                            selectedLoad = load
+                            onOpenLoadDetails(load)
                             viewModel.recordInteraction(load, InteractionType.VIEWED)
                             ContentlessTelemetry.record(
                                 context,
@@ -438,7 +506,7 @@ fun LoadListScreen(
                                     context,
                                     TelemetryEvents.funnel("call_tapped")
                                 )
-                                context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${load.phone}")))
+                                Unit // Demo contacts are never dialled.
                             }
                         },
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -672,7 +740,7 @@ private fun FilterPill(
 }
 
 @Composable
-fun LoadDetailBottomSheetV2(
+fun LoadDetailScreen(
     load: LoadOfferEntity,
     matchResult: MatchResult?,
     parseFeedback: InteractionType?,
@@ -688,13 +756,6 @@ fun LoadDetailBottomSheetV2(
 
     BackHandler(onBack = onDismiss)
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
-    ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -711,7 +772,7 @@ fun LoadDetailBottomSheetV2(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 184.dp),
+                    .padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 100.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 DetailTopBarV2()
@@ -734,18 +795,17 @@ fun LoadDetailBottomSheetV2(
 
             Surface(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 56.dp),
+                    .align(Alignment.BottomCenter),
                 color = DetailBackground.copy(alpha = 0.96f),
                 tonalElevation = 0.dp
             ) {
                 Button(
                     onClick = onCallClick,
-                    enabled = load.phone.isNotBlank(),
+                    enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 14.dp)
-                        .height(50.dp),
+                        .heightIn(min = 50.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = DetailAccent,
@@ -755,7 +815,7 @@ fun LoadDetailBottomSheetV2(
                     Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "ARA",
+                        text = "DEMO",
                         style = MaterialTheme.typography.titleSmall,
                         fontSize = detailFixedSp(15),
                         fontWeight = FontWeight.Bold,
@@ -775,7 +835,7 @@ fun LoadDetailBottomSheetV2(
         }
     }
 }
-}
+
 
 @Composable
 private fun DetailParseFeedbackV2(
@@ -900,7 +960,7 @@ private fun DetailRawMessageBlockV2(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(role = Role.Button, onClick = onToggle),
-                text = if (expanded) "Orijinal WhatsApp mesajını gizle" else "Orijinal WhatsApp mesajını göster",
+                text = if (load.sourceGroup == com.example.test.data.remote.SHARED_LISTING_SOURCE) { if(expanded) "İlan metnini gizle" else "Yayınlanan ilan metnini göster" } else { if(expanded) "Orijinal WhatsApp mesajını gizle" else "Orijinal WhatsApp mesajını göster" },
                 style = MaterialTheme.typography.labelMedium,
                 fontSize = detailFixedSp(13),
                 color = DetailTextMuted,
@@ -1241,7 +1301,7 @@ private fun DetailCardV2(
 
 @Composable
 private fun detailFixedSp(value: Int): TextUnit {
-    return (value / LocalDensity.current.fontScale).sp
+    return value.sp
 }
 
 internal data class RawMessageDisplayLine(

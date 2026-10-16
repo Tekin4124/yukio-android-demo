@@ -111,6 +111,9 @@ fun LoadCard(
                     if (isTestOffer) {
                         TestOfferBadge()
                     }
+                    if (load.sourceGroup == com.example.test.data.remote.SHARED_LISTING_SOURCE) {
+                        Text("DEMO İLANI", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    }
                     Text(
                         text = routeText,
                         style = MaterialTheme.typography.titleSmall,
@@ -147,7 +150,7 @@ fun LoadCard(
                         softWrap = false
                     )
                     CallButton(
-                        enabled = load.phone.isNotBlank(),
+                        enabled = false,
                         onClick = onCallClick
                     )
                 }
@@ -250,7 +253,7 @@ private fun CallButton(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
-                text = "ARA",
+                text = "DEMO",
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,

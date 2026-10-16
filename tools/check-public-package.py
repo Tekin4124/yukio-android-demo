@@ -9,6 +9,7 @@ EXCLUDED = {'.git', '.gradle', '.kotlin', '.idea', 'build', '__pycache__'}
 PROHIBITED_DIRS = {'backend', 'deploy', 'secrets-local', 'experimental', 'gold_labeling', 'whatsapp-collector', 'prompts'}
 PROHIBITED_TEXT = [
     ('private production host', re.compile(r'https?://(?!(?:127\.0\.0\.1|10\.0\.2\.2)(?:[:/]))(?:[0-9]+(?:\.[0-9]+){3}|[^\s"<>/]+\.sslip\.io)')),
+    ('GitHub token', re.compile(r'\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})')),
     ('credential material', re.compile(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{20,}')),
 ]
 errors = []
@@ -24,6 +25,8 @@ for path in ROOT.rglob('*'):
     if path.is_symlink():
         errors.append(f'Symlink: {rel}')
         continue
+    if rel.as_posix() in {'app/src/main/java/com/example/test/billing/BillingBackendApi.kt', 'app/src/main/java/com/example/test/billing/InstallationProofSigner.kt'}:
+        errors.append(f'Production access transport: {rel}')
     if path.name == 'local.properties':
         continue  # SDK path only; archive and Git exclude this local file.
     if path.name.startswith('.env') or path.suffix.lower() in {'.jks', '.keystore', '.p12', '.pfx', '.bundle', '.apk', '.aab'}:

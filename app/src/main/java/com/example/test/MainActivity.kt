@@ -2,6 +2,15 @@
 package com.example.test
 
 import android.Manifest
+import android.net.Uri
+import com.google.gson.Gson
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.test.viewmodel.LoadListViewModel
+import com.example.test.data.local.LoadOfferEntity
+import com.example.test.ai.InteractionType
+import com.example.test.ui.screens.LoadDetailScreen
+import com.example.test.ui.screens.ManualListingScreen
+import com.example.test.ui.screens.ReferralScreen
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -85,6 +94,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 sealed class AppRoute(val route: String) {
+    data object ManualListing : AppRoute("manual_listing")
+    data object Detail : AppRoute("load_detail")
+    data object Referral : AppRoute("referral")
     data object Main : AppRoute("main")
     data object Map : AppRoute("map")
     data object Profile : AppRoute("profile")
@@ -455,6 +467,11 @@ fun AppNavHost(
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         MainScreen(
+                            onOpenLoadDetails = { load ->
+                                it.savedStateHandle["detail_load_json"] = Gson().toJson(load)
+                                navController.navigate(AppRoute.Detail.route)
+                            },
+                            onCreateListing = { navController.navigate(AppRoute.ManualListing.route) },
                             openLoadId = openLoadId,
                             topBarUsesStatusInsets = notificationHealth.automaticChecksPassed,
                             onOpenLoadHandled = {
@@ -471,6 +488,27 @@ fun AppNavHost(
                 }
             }
         }
+        composable(AppRoute.Detail.route) { entry ->
+            val mainEntry = remember(entry) { navController.getBackStackEntry(AppRoute.Main.route) }
+            val mainViewModel: LoadListViewModel = viewModel(viewModelStoreOwner = mainEntry)
+            val state by mainViewModel.uiState.collectAsStateWithLifecycle()
+            val savedJson = mainEntry.savedStateHandle.get<String>("detail_load_json")
+            val savedLoad = remember(savedJson) { runCatching { Gson().fromJson(savedJson, LoadOfferEntity::class.java) }.getOrNull() }
+            val load = state.loads.firstOrNull { it.id == savedLoad?.id } ?: savedLoad
+            if(load != null) {
+                LaunchedEffect(load.id) { mainViewModel.recordSampleOpened(load) }
+                LoadDetailScreen(load=load,matchResult=state.matchResults[load.id],parseFeedback=state.parseFeedback[load.id],
+                    siblingLoads=state.loads.filter { it.id != load.id && it.rawMessage == load.rawMessage },
+                    onParseFeedback={ feedback -> mainViewModel.recordInteraction(load,feedback) },
+                    onCallClick={
+                        mainViewModel.recordInteraction(load,InteractionType.CALLED)
+                        ContentlessTelemetry.record(context,TelemetryEvents.funnel("call_tapped"))
+                        Unit // Demo has no dial action.
+                    },onDismiss={navController.popBackStack()})
+            } else { LaunchedEffect(Unit) { navController.popBackStack() } }
+        }
+        composable(AppRoute.ManualListing.route) { ManualListingScreen(onBack={navController.popBackStack()}) }
+        composable(AppRoute.Referral.route) { ReferralScreen(onBack={navController.popBackStack()}) }
         composable(AppRoute.Map.route) {
             MapScreen(
                 onBackClick = { navController.popBackStack() },
@@ -484,6 +522,7 @@ fun AppNavHost(
         }
         composable(AppRoute.Profile.route) {
             VehicleProfileScreen(
+                onOpenReferral = { navController.navigate(AppRoute.Referral.route) },
                 themeMode = themeMode,
                 onThemeModeChange = onThemeModeChange,
                 onOpenNotificationHealth = {
